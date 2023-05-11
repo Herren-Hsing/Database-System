@@ -1,0 +1,7 @@
+insert into movie (movieid,moviename,duration,country,language,releasetime) values (3,'肖申克的救赎',142,'美国','英语','1994-9-10');
+
+select *from movie where movieid in(select movieid from havetype where movietypename='爱情');
+
+
+insert into havetype(movieid,movietypename) values(14,'剧情');
+insert into havetype(movieid,movietypename) values(15,'动作'),(15,'剧情'),(15,'犯罪');

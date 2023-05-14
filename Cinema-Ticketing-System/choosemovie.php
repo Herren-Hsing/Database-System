@@ -2,11 +2,21 @@
 <html>
 
 <head>
-    <title>电影信息管理</title>
+    <title>正在热映</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+
     <style>
+        .h1-style {
+            text-align: center;
+            font-family: 'Zhi Mang Xing', cursive;
+            font-size: 60px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
         .container {
-            background-color: #f2f2f2;
-            border: 1px solid #ccc;
             padding: 10px;
             margin: 10px;
             display: flex;
@@ -119,6 +129,7 @@
             color: white;
         }
     </style>
+    <h1 class="h1-style">正在热映</h1>
 </head>
 
 <body>
@@ -127,54 +138,33 @@
             <input type="text" name="name" style="width:50%;" placeholder="搜索电影名称...">
             <button type="submit" class="filter-button">搜索</button>
         </form>
-
-        <button id="showPopup" onclick="showPopup()" class="new-button">添加新电影</button>
-
-        <form id="myForm" method="post" action='updatemovie.php'
-            style="border-radius: 10px;text-align: center; box-shadow: 0px 0px 10px grey;display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; ">
-            <label for="movieid">电影ID</label>
-            <input type="text" id="movieid" name="movieid"><br>
-            <label for="moviename">电影名称</label>
-            <input type="text" id="moviename" name="moviename"><br>
-            <label for="duration">时长</label>
-            <input type="text" id="duration" name="duration"><br>
-            <label for="country">国家</label>
-            <input type="text" id="country" name="country"><br>
-            <label for="language">语言</label>
-            <input type="text" id="language" name="language"><br>
-            <label for="releasetime">上映时间</label>
-            <input type="date" id="releasetime" name="releasetime"><br>
-            <button type="submit">添加</button>
-            <button type="button" onclick="closeForm()">关闭</button>
-        </form>
-
-        <button id="showPopup" onclick="redirectToShowingManage()" class="new-button">电影场次管理</button>
-        <button id="showPopup" onclick="redirectToTicket()" class="new-button">订单管理</button>
-        <button id="showPopup" onclick="redirectToIndex()" class="new-button">返回首页</button>
+        <button id="showPopup" onclick="redirectToTicket('<?php echo $_GET['userid']; ?>')"
+            class="new-button">我的订单</button>
+        <button id="showPopup" onclick="redirectToCenter('<?php echo $_GET['userid']; ?>')"
+            class="new-button">个人中心</button>
+        <button id="showPopup" onclick="redirectToIndex()" class="new-button">退出登录</button>
 
         <script>
-            function redirectToShowingManage() {
-                window.location.href = "showingmanage.php";
-            }
-            function redirectToTicket() {
-                window.location.href = "ticketmanage.php";
-            }
             function redirectToIndex() {
                 window.location.href = "index.html";
             }
+            function redirectToCenter(userid) {
+                window.location.href = "information.php?userid=" + userid;
+            }
+            function redirectToTicket(userid) {
+                window.location.href = "myticket.php?userid=" + userid;
+            }
         </script>
-    </div>
 
+    </div>
     <table>
         <thead>
             <tr>
-                <th>电影ID</th>
                 <th>电影名称</th>
                 <th>时长</th>
                 <th>国家</th>
                 <th>语言</th>
                 <th>类型</th>
-                <th>上映时间</th>
                 <th>场次数</th>
                 <th>操作</th>
             </tr>
@@ -185,37 +175,26 @@
             include("connect.php");
 
             // 查询电影信息
-            $sql = "SELECT m.movieid, m.MovieName, m.Duration, m.Country, m.Language, GROUP_CONCAT(DISTINCT ht.MovieTypeName) AS Types, m.ReleaseTime, COUNT(distinct s.showingid) AS ShowingCount
-            FROM Movie m
-            LEFT JOIN (SELECT DISTINCT MovieID, MovieTypeName FROM havetype) ht ON m.MovieID = ht.MovieID
-            LEFT JOIN showing s ON m.MovieID = s.MovieID
-                WHERE 1=1";
+            $sql = "SELECT * FROM movie_info_view WHERE 1=1";
 
             if (isset($_GET['name'])) {
                 $name = $_GET['name'];
-                $sql .= " AND m.MovieName LIKE '%$name%'";
+                $sql .= " AND moviename LIKE '%$name%'";
             }
 
-            $sql .= " GROUP BY m.MovieID";
-
             $result = $conn->query($sql);
-
             // 输出表格
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row["movieid"] . "</td>";
-                    echo "<td>" . $row["MovieName"] . "</td>";
-                    echo "<td>" . $row["Duration"] . "</td>";
-                    echo "<td>" . $row["Country"] . "</td>";
-                    echo "<td>" . $row["Language"] . "</td>";
-                    echo "<td>" . $row["Types"] . "</td>";
-                    echo "<td>" . $row["ReleaseTime"] . "</td>";
-                    echo "<td>" . $row["ShowingCount"] . "</td>";
+                    echo "<td>" . $row["moviename"] . "</td>";
+                    echo "<td>" . $row["duration"] . "</td>";
+                    echo "<td>" . $row["country"] . "</td>";
+                    echo "<td>" . $row["language"] . "</td>";
+                    echo "<td>" . $row["types"] . "</td>";
+                    echo "<td>" . $row["showingcount"] . "</td>";
                     echo "<td>
-                    <button class='filter-button' onclick=\"window.location.href='updatemovieinfo.php?movieid=" . $row['movieid'] . "'\">修改</button>
-
-                    <button class='filter-button' onclick=\"deleteMovie('" . $row['movieid'] . "')\">删除</button>
+                    <button class='filter-button' onclick=\"chooseshowing('" . $row['movieid'] . "', '" . $_GET['userid'] . "')\">查看场次</button>
                     </td>";
                     echo "</tr>";
                 }
@@ -230,14 +209,15 @@
         </tbody>
     </table>
     <script>
-        function deleteMovie(movieId) {
-            if (confirm("确定要删除该电影吗？")) {
-                window.location.href = "deletemovie.php?movieid=" + movieId;
-            }
+        function chooseshowing(movieId, userId) {
+            window.location.href = "chooseshowing.php?movieid=" + movieId + "&userid=" + userId;
         }
     </script>
 
     <script>
+
+
+
         const searchInput = document.querySelector('input[type="text"]');
         const searchButton = document.querySelector('button[type="submit"]');
         const form = document.createElement('form');

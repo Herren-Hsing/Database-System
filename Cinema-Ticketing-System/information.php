@@ -3,15 +3,16 @@
 include("connect.php");
 
 // 获取COOKIE中的userid
-$userid = $_COOKIE["userid"];
+$userid = $_GET["userid"];
 
 // 检索电话号码、生日和座右铭
-$sql = "SELECT gender,phone, birthday, motto FROM user WHERE userid='$userid'";
+$sql = "SELECT username,gender,phone, birthday, motto FROM user WHERE userid='$userid'";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
   // 输出数据
   while ($row = $result->fetch_assoc()) {
+    $username = $row["username"];
     $phone = $row["phone"];
     $birthday = $row["birthday"];
     $motto = $row["motto"];
@@ -21,10 +22,9 @@ if ($result->num_rows > 0) {
 } else {
   echo "0 结果";
 }
-
-
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html>
 
@@ -153,8 +153,9 @@ $conn->close();
     <h1>个人信息</h1>
     <div class="center">
       <form method="post" action="update.php">
+        <input type="hidden" name="userid" value="<?php echo $userid; ?>">
         <label for="username">用户名:</label>
-        <input type="text" id="username" name="username" disabled>
+        <input type="text" id="username" name="username" value="<?php echo $username; ?>" disabled>
         <label for="gender">性别:</label>
         <select id="gender" name="gender">
           <option value="secret" <?php if ($gender == 'secret')
@@ -201,6 +202,8 @@ $conn->close();
             echo 'selected'; ?>>恒星性别</option>
           <option value="awakening gender" <?php if ($gender == 'awakening gender')
             echo 'selected'; ?>>唤醒性别</option>
+            <option value="Walmart shopping bags" <?php if ($gender == 'Walmart shopping bags')
+            echo 'selected'; ?>>沃尔玛购物袋</option>
           <option value="others" <?php if ($gender == 'others')
             echo 'selected'; ?>>其他</option>
         </select>
@@ -210,28 +213,19 @@ $conn->close();
         <input type="text" id="phone" name="phone" value="<?php echo $phone; ?>">
 
         <label for="motto">个性签名:</label>
-        <input type="text" id="motto" name="motto" value="<?php echo $phone; ?>">
+        <input type="text" id="motto" name="motto" value="<?php echo $motto; ?>">
         <br>
         <input type="submit" value="保存">
       </form>
-      <form>
-        <button class="return-button">返回</button>
-      </form>
+      <button class="return-button" onclick="redirectToChooseMovie()">返回</button>
     </div>
   </div>
   </div>
+
   <script>
-    var username = getCookie("username");
-    document.getElementById("username").value = username;
-    function getCookie(name) {
-      var cookies = document.cookie.split(';');
-      for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
-        if (cookie.startsWith(name + '=')) {
-          return decodeURIComponent(cookie.substring(name.length + 1));
-        }
-      }
-      return "";
+    function redirectToChooseMovie() {
+      var userid = "<?php echo $userid; ?>";
+      window.location.href = "choosemovie.php?userid=" + userid;
     }
   </script>
 </body>

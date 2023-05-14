@@ -8,10 +8,6 @@
     body {
       background-color: #f2f2f2;
       font-family: Arial, sans-serif;
-      /*background-image: url(1.jfif), url(right-background-image.jpg);
-        background-repeat: no-repeat, no-repeat;
-        background-position: 20px 50px;  水平居中，垂直偏移 50px 
-        background-size: 50% 800px;  宽度 100%，高度 8000px */
     }
 
     .login-container {
@@ -59,7 +55,7 @@
 
     input[type="password"] {
       -webkit-text-security: disc;
-      text-security: disc;
+      input-security: disc;
     }
 
     button[type="submit"] {
@@ -115,9 +111,11 @@
       <label for="repassword">Confirm Password</label>
       <input type="password" name="repassword" required onkeyup="checks()">
       <span id="password-status"></span>
+
       <button type="submit" id="register-button" disabled>Register</button>
     </form>
     <script>
+      // 用户名和密码合法性检查
       function checks() {
         var username = document.getElementsByName('username')[0].value;
         var pattern1 = /^[\w\u4e00-\u9fa5]{4,10}$/;
@@ -178,36 +176,7 @@
           registerButton.disabled = false;
         }
       }
-
-      function checkPassword() {
-        var registerButton = document.getElementById('register-button');
-        if (!pattern.test(password)) {
-          status.innerHTML = "Passwords should be formed by both English letter and figures and must be limited to 6~16 characters. ";
-          status.style.color = "red";
-          if (password !== repassword) {
-            status.innerHTML = "Passwords should be formed by both English letter and figures and must be limited to 6~16 characters. The passwords you typed do not match!";
-            status.style.color = "red";
-          }
-        }
-
-        if (password !== repassword) {
-          status.innerHTML = "The passwords you typed do not match!";
-          status.style.color = "red";
-          if (!pattern.test(password)) {
-            status.innerHTML = "Passwords should be formed by both English letter and figures and  must be limited to 6~16 characters. The passwords you typed do not match!";
-            status.style.color = "red";
-          }
-        }
-        if (pattern.test(password) && (password == repassword)) {
-          status.innerHTML = "";
-          status.style.color = "green";
-        }
-        if (status.innerHTML !== "" || password !== repassword) {
-          registerButton.disabled = true;
-        } else {
-          registerButton.disabled = false;
-        }
-      }
+      
     </script>
   </div>
   </div>

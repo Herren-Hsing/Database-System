@@ -1,5 +1,3 @@
-<!--register.php-->
-
 <?php
 
 //获取表单数据
@@ -26,7 +24,7 @@ if (mysqli_num_rows($result) > 0) {
 	exit();
 }
 
-//向数据库中插入新用户，userid位置插入null，因为建表时userid字段设置为自动递增，useridj就会自动增长
+//向数据库中插入新用户，userid位置插入null，因为建表时userid字段设置为自动递增，userid就会自动增长
 $sql = "insert into user(username,password) values('$username','$password')";
 $result = mysqli_query($conn, $sql);
 if ($result) {

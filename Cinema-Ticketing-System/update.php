@@ -2,8 +2,7 @@
 //连接数据库
 include("connect.php");
 
-// 获取COOKIE中的userid
-$userid = $_COOKIE["userid"];
+$userid = $_POST["userid"];
 
 // 获取POST请求中的数据并进行安全性验证
 if (isset($_POST["gender"])) {
@@ -34,9 +33,9 @@ $sql = "UPDATE user SET  gender='$gender', birthday='$birthday', phone='$phone',
 
 if ($conn->query($sql) === TRUE) {
     echo '<script>alert("用户信息已更新");</script>';
-    echo '<script>window.location.href = "information.php";</script>';
+    echo "<script>url = \"information.php?userid=$userid\"; window.location.href = url;</script>";
 } else {
-    echo '<script>alert("更新失败: '.$conn->error.'");</script>';
+    echo '<script>alert("更新失败");</script>';
 }
 
 

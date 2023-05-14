@@ -2,11 +2,20 @@
 <html>
 
 <head>
-    <title>电影信息管理</title>
+    <title>正在热映</title>
+    <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
     <style>
+        .h1-style {
+            text-align: center;
+            font-family: 'Zhi Mang Xing', cursive;
+            font-size: 60px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
         .container {
-            background-color: #f2f2f2;
-            border: 1px solid #ccc;
             padding: 10px;
             margin: 10px;
             display: flex;
@@ -56,6 +65,7 @@
             margin-bottom: 10px;
         }
 
+        /* 标签样式 */
         label {
             display: inline-block;
             margin-bottom: 10px;
@@ -95,11 +105,13 @@
             cursor: pointer;
         }
 
+        /* 提交按钮样式 */
         #submit {
             background-color: #4CAF50;
             color: white;
         }
 
+        /* 关闭按钮样式 */
         #close {
             background-color: #f44336;
             color: white;
@@ -119,63 +131,50 @@
             color: white;
         }
     </style>
+    <h1 class="h1-style" id="movie-title">正在热映</h1>
+
+    <?php
+    $movieID = $_GET['movieid'];
+    include("connect.php");
+    $sql = "SELECT moviename FROM movie WHERE movieid = '$movieID'";
+    $result = $conn->query($sql);
+    if ($result->num_rows > 0) {
+        // 输出数据
+        $row = $result->fetch_assoc();
+        $moviename = $row["moviename"];
+    }
+    ?>
+
+    <script>
+        var movieId = "<?php echo $movieID; ?>";
+        var movieName = "<?php echo $moviename; ?>";
+
+        // 这里使用了ES6模板字符串来构建新的文本内容
+        var newTitle = `${movieName} 正在热映`;
+
+        // 通过id选择器获取h1元素
+        var h1Element = document.getElementById("movie-title");
+
+        // 将新的文本内容赋值给h1元素
+        h1Element.textContent = newTitle;
+    </script>
+
 </head>
 
 <body>
-    <div class="container">
-        <form method="get">
-            <input type="text" name="name" style="width:50%;" placeholder="搜索电影名称...">
-            <button type="submit" class="filter-button">搜索</button>
-        </form>
 
-        <button id="showPopup" onclick="showPopup()" class="new-button">添加新电影</button>
-
-        <form id="myForm" method="post" action='updatemovie.php'
-            style="border-radius: 10px;text-align: center; box-shadow: 0px 0px 10px grey;display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; ">
-            <label for="movieid">电影ID</label>
-            <input type="text" id="movieid" name="movieid"><br>
-            <label for="moviename">电影名称</label>
-            <input type="text" id="moviename" name="moviename"><br>
-            <label for="duration">时长</label>
-            <input type="text" id="duration" name="duration"><br>
-            <label for="country">国家</label>
-            <input type="text" id="country" name="country"><br>
-            <label for="language">语言</label>
-            <input type="text" id="language" name="language"><br>
-            <label for="releasetime">上映时间</label>
-            <input type="date" id="releasetime" name="releasetime"><br>
-            <button type="submit">添加</button>
-            <button type="button" onclick="closeForm()">关闭</button>
-        </form>
-
-        <button id="showPopup" onclick="redirectToShowingManage()" class="new-button">电影场次管理</button>
-        <button id="showPopup" onclick="redirectToTicket()" class="new-button">订单管理</button>
-        <button id="showPopup" onclick="redirectToIndex()" class="new-button">返回首页</button>
-
-        <script>
-            function redirectToShowingManage() {
-                window.location.href = "showingmanage.php";
-            }
-            function redirectToTicket() {
-                window.location.href = "ticketmanage.php";
-            }
-            function redirectToIndex() {
-                window.location.href = "index.html";
-            }
-        </script>
-    </div>
 
     <table>
         <thead>
             <tr>
-                <th>电影ID</th>
                 <th>电影名称</th>
-                <th>时长</th>
-                <th>国家</th>
-                <th>语言</th>
-                <th>类型</th>
-                <th>上映时间</th>
-                <th>场次数</th>
+                <th>影院名称</th>
+                <th>影院地址</th>
+                <th>放映厅</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>座位余量</th>
+                <th>票价</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -183,39 +182,26 @@
             <?php
             // 连接数据库
             include("connect.php");
-
             // 查询电影信息
-            $sql = "SELECT m.movieid, m.MovieName, m.Duration, m.Country, m.Language, GROUP_CONCAT(DISTINCT ht.MovieTypeName) AS Types, m.ReleaseTime, COUNT(distinct s.showingid) AS ShowingCount
-            FROM Movie m
-            LEFT JOIN (SELECT DISTINCT MovieID, MovieTypeName FROM havetype) ht ON m.MovieID = ht.MovieID
-            LEFT JOIN showing s ON m.MovieID = s.MovieID
-                WHERE 1=1";
-
-            if (isset($_GET['name'])) {
-                $name = $_GET['name'];
-                $sql .= " AND m.MovieName LIKE '%$name%'";
-            }
-
-            $sql .= " GROUP BY m.MovieID";
+            $sql = "SELECT * FROM movie_showing_view WHERE movieid = '{$_GET['movieid']}';";
 
             $result = $conn->query($sql);
-
             // 输出表格
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
-                    echo "<td>" . $row["movieid"] . "</td>";
-                    echo "<td>" . $row["MovieName"] . "</td>";
-                    echo "<td>" . $row["Duration"] . "</td>";
-                    echo "<td>" . $row["Country"] . "</td>";
-                    echo "<td>" . $row["Language"] . "</td>";
-                    echo "<td>" . $row["Types"] . "</td>";
-                    echo "<td>" . $row["ReleaseTime"] . "</td>";
-                    echo "<td>" . $row["ShowingCount"] . "</td>";
+                    echo "<td>" . $row["moviename"] . "</td>";
+                    echo "<td>" . $row["cinemaname"] . "</td>";
+                    echo "<td>" . $row["address"] . "</td>";
+                    echo "<td>" . $row["roomname"] . "</td>";
+                    echo "<td>" . $row["starttime"] . "</td>";
+                    echo "<td>" . $row["endtime"] . "</td>";
+                    echo "<td>" . $row["seatsremained"] . "</td>";
+                    echo "<td>" . $row["price"] . "</td>";
                     echo "<td>
-                    <button class='filter-button' onclick=\"window.location.href='updatemovieinfo.php?movieid=" . $row['movieid'] . "'\">修改</button>
-
-                    <button class='filter-button' onclick=\"deleteMovie('" . $row['movieid'] . "')\">删除</button>
+                    <button class='filter-button' 
+                    onclick=\"newticket('" . $row['movieid'] . "', '" . $_GET['userid'] . "')\">
+                    购票</button>
                     </td>";
                     echo "</tr>";
                 }
@@ -230,13 +216,20 @@
         </tbody>
     </table>
     <script>
-        function deleteMovie(movieId) {
-            if (confirm("确定要删除该电影吗？")) {
-                window.location.href = "deletemovie.php?movieid=" + movieId;
-            }
+        function newticket(movieId, userId) {
+            window.location.href = "newticket.php?movieid=" + movieId + "&userid=" + userId;
         }
     </script>
+    <div class="container">
 
+        <button id="showPopup" onclick="redirectToIndex(<?php echo $_GET['userid']; ?>)"
+            class="new-button">返回前页</button>
+        <script>
+            function redirectToIndex(userid) {
+                window.location.href = "choosemovie.php?userid=" + userid;
+            }
+        </script>
+    </div>
     <script>
         const searchInput = document.querySelector('input[type="text"]');
         const searchButton = document.querySelector('button[type="submit"]');

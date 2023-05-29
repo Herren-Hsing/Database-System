@@ -12,6 +12,7 @@ mysqli_select_db($conn, 'cinema');
 
 //选择字符集
 mysqli_set_charset($conn, 'utf8');
+
 $showingid = $_POST['showingid'];
 $movieid = $_POST['movieid'];
 $roomid = $_POST['roomid'];
@@ -37,16 +38,14 @@ $endtime = date('Y-m-d H:i:s', strtotime($endtime));
 $sql = "INSERT INTO showing (showingid, movieid, roomid, seatsremained, price, starttime, endtime) 
         VALUES ('$showingid', '$movieid', '$roomid', '$seatsremained', '$price', '$starttime', '$endtime')";
 
-try {
-    // 执行插入语句
-    if ($conn->query($sql) === TRUE) {
-        echo "<script>alert('数据插入成功！');</script>";
-    } else {
-        echo "<script>alert('数据插入失败：" . $conn->error . "');</script>";
-    }
-} catch (mysqli_sql_exception $e) {
-    echo "<script>alert('数据插入失败：" . $e->getMessage() . "');</script>";
+
+// 执行插入语句
+if ($conn->query($sql) === TRUE) {
+    echo "<script>alert('数据插入成功！');</script>";
+} else {
+    echo "<script>alert('数据插入失败：" . $conn->error . "');</script>";
 }
+
 
 echo "<script>url = \"moviemanage.php?\"; window.location.href = url;</script>";
 

@@ -23,7 +23,7 @@ if (mysqli_num_rows($result) > 0) {
     $userid = $row['userid'];
 
     //将用户ID存储到cookie中
-    $expire_time = time() + 3600; //设置cookie的过期时间为1小时
+    $expire_time = time() + 3600;
     setcookie("userid", $userid, $expire_time);
     setcookie("username", $username, $expire_time);
 

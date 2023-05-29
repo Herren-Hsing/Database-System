@@ -162,12 +162,10 @@ $conn->close();
 
         .form-row select {
             width: 320px;
-            /* 自定义宽度值 */
         }
 
         .form-row input {
             width: 320px;
-            /* 自定义宽度值 */
         }
 
         form label,
@@ -278,7 +276,7 @@ $conn->close();
                             var showing = document.querySelectorAll("#showingid option");
 
                             for (var i = 0; i < showing.length; i++) {
-                                if ((showing[i].getAttribute("data-movieid") === movieId || movieId === "")&&showing[i].getAttribute("data-cinemaid") === cinemaId) {
+                                if ((showing[i].getAttribute("data-movieid") === movieId || movieId === "") && showing[i].getAttribute("data-cinemaid") === cinemaId) {
                                     showing[i].style.display = "block";
                                 } else {
                                     showing[i].style.display = "none";

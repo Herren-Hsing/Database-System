@@ -4,7 +4,6 @@
 <head>
     <title>正在热映</title>
     <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
-
     <style>
         .h1-style {
             text-align: center;
@@ -105,11 +104,13 @@
             cursor: pointer;
         }
 
+        /* 提交按钮样式 */
         #submit {
             background-color: #4CAF50;
             color: white;
         }
 
+        /* 关闭按钮样式 */
         #close {
             background-color: #f44336;
             color: white;
@@ -129,43 +130,46 @@
             color: white;
         }
     </style>
-    <h1 class="h1-style">正在热映</h1>
+    <h1 class="h1-style" id="movie-title">正在热映</h1>
+
+    <?php
+    $movieID = $_GET['movieid'];
+    include("connect.php");
+    $sql = "SELECT moviename FROM movie WHERE movieid = '$movieID'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // 输出数据
+        $row = $result->fetch_assoc();
+        $moviename = $row["moviename"];
+    }
+    ?>
+
+    <script>
+        var movieId = "<?php echo $movieID; ?>";
+        var movieName = "<?php echo $moviename; ?>";
+        // 这里使用了ES6模板字符串来构建新的文本内容
+        var newTitle = `${movieName} 正在热映`;
+        // 通过id选择器获取h1元素
+        var h1Element = document.getElementById("movie-title");
+        // 将新的文本内容赋值给h1元素
+        h1Element.textContent = newTitle;
+    </script>
+
 </head>
 
 <body>
-    <div class="container">
-        <form method="get">
-            <input type="text" name="name" style="width:50%;" placeholder="搜索电影名称...">
-            <button type="submit" class="filter-button">搜索</button>
-        </form>
-        <button id="showPopup" onclick="redirectToTicket('<?php echo $_GET['userid']; ?>')"
-            class="new-button">我的订单</button>
-        <button id="showPopup" onclick="redirectToCenter('<?php echo $_GET['userid']; ?>')"
-            class="new-button">个人中心</button>
-        <button id="showPopup" onclick="redirectToIndex()" class="new-button">退出登录</button>
-
-        <script>
-            function redirectToIndex() {
-                window.location.href = "index.html";
-            }
-            function redirectToCenter(userid) {
-                window.location.href = "information.php?userid=" + userid;
-            }
-            function redirectToTicket(userid) {
-                window.location.href = "myticket.php?userid=" + userid;
-            }
-        </script>
-
-    </div>
     <table>
         <thead>
             <tr>
                 <th>电影名称</th>
-                <th>时长</th>
-                <th>国家</th>
-                <th>语言</th>
-                <th>类型</th>
-                <th>场次数</th>
+                <th>影院名称</th>
+                <th>影院地址</th>
+                <th>放映厅</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>座位余量</th>
+                <th>票价</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -173,14 +177,8 @@
             <?php
             // 连接数据库
             include("connect.php");
-
             // 查询电影信息
-            $sql = "SELECT * FROM movie_info_view WHERE 1=1";
-
-            if (isset($_GET['name'])) {
-                $name = $_GET['name'];
-                $sql .= " AND moviename LIKE '%$name%'";
-            }
+            $sql = "SELECT * FROM movie_showing_view WHERE movieid = '{$_GET['movieid']}';";
 
             $result = $conn->query($sql);
             // 输出表格
@@ -188,13 +186,17 @@
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
                     echo "<td>" . $row["moviename"] . "</td>";
-                    echo "<td>" . $row["duration"] . "</td>";
-                    echo "<td>" . $row["country"] . "</td>";
-                    echo "<td>" . $row["language"] . "</td>";
-                    echo "<td>" . $row["types"] . "</td>";
-                    echo "<td>" . $row["showingcount"] . "</td>";
+                    echo "<td>" . $row["cinemaname"] . "</td>";
+                    echo "<td>" . $row["address"] . "</td>";
+                    echo "<td>" . $row["roomname"] . "</td>";
+                    echo "<td>" . $row["starttime"] . "</td>";
+                    echo "<td>" . $row["endtime"] . "</td>";
+                    echo "<td>" . $row["seatsremained"] . "</td>";
+                    echo "<td>" . $row["price"] . "</td>";
                     echo "<td>
-                    <button class='filter-button' onclick=\"chooseshowing('" . $row['movieid'] . "', '" . $_GET['userid'] . "')\">查看场次</button>
+                    <button class='filter-button' 
+                    onclick=\"newticket('" . $row['movieid'] . "', '" . $_GET['userid'] . "')\">
+                    购票</button>
                     </td>";
                     echo "</tr>";
                 }
@@ -209,15 +211,20 @@
         </tbody>
     </table>
     <script>
-        function chooseshowing(movieId, userId) {
-            window.location.href = "chooseshowing.php?movieid=" + movieId + "&userid=" + userId;
+        function newticket(movieId, userId) {
+            window.location.href = "newticket.php?movieid=" + movieId + "&userid=" + userId;
         }
     </script>
-
+    <div class="container">
+        <button id="showPopup" onclick="redirectToIndex(<?php echo $_GET['userid']; ?>)"
+            class="new-button">返回前页</button>
+        <script>
+            function redirectToIndex(userid) {
+                window.location.href = "choosemovie.php?userid=" + userid;
+            }
+        </script>
+    </div>
     <script>
-
-
-
         const searchInput = document.querySelector('input[type="text"]');
         const searchButton = document.querySelector('button[type="submit"]');
         const form = document.createElement('form');

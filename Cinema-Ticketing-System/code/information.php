@@ -2,10 +2,8 @@
 //连接数据库
 include("connect.php");
 
-// 获取COOKIE中的userid
 $userid = $_GET["userid"];
 
-// 检索电话号码、生日和座右铭
 $sql = "SELECT username,gender,phone, birthday, motto FROM user WHERE userid='$userid'";
 $result = $conn->query($sql);
 
@@ -202,8 +200,9 @@ $conn->close();
             echo 'selected'; ?>>恒星性别</option>
           <option value="awakening gender" <?php if ($gender == 'awakening gender')
             echo 'selected'; ?>>唤醒性别</option>
-            <option value="Walmart shopping bags" <?php if ($gender == 'Walmart shopping bags')
-            echo 'selected'; ?>>沃尔玛购物袋</option>
+          <option value="Walmart shopping bags" <?php if ($gender == 'Walmart shopping bags')
+            echo 'selected'; ?>>沃尔玛购物袋
+          </option>
           <option value="others" <?php if ($gender == 'others')
             echo 'selected'; ?>>其他</option>
         </select>

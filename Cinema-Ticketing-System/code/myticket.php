@@ -98,13 +98,11 @@
             cursor: pointer;
         }
 
-        /* 提交按钮样式 */
         #submit {
             background-color: #4CAF50;
             color: white;
         }
 
-        /* 关闭按钮样式 */
         #close {
             background-color: #f44336;
             color: white;
